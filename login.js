@@ -1,10 +1,13 @@
 const { createClient } = supabase;
-const supabaseUrl = "https://jdkivaqlqzuvqilvypxb.supabase.co";
+
+
+const supabaseUrl = "https://cxeurmmnzhehulxwerku.supabase.co";
 const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impka2l2YXFscXp1dnFpbHZ5cHhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzMjQzNDMsImV4cCI6MjA1NzkwMDM0M30.kGKacn6FOFhCwYLacTY-PJ21GEj14hJy2MnD9Apf9GM";
 
-const supabaseClient = createClient("https://jdkivaqlqzuvqilvypxb.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impka2l2YXFscXp1dnFpbHZ5cHhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzMjQzNDMsImV4cCI6MjA1NzkwMDM0M30.kGKacn6FOFhCwYLacTY-PJ21GEj14hJy2MnD9Apf9GM");
+const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Attach login event listener
     document.getElementById("login-btn").addEventListener("click", async () => {
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
@@ -15,17 +18,27 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-        });
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email,
+                password
+            });
 
-        if (error) {
-            errorMessage.textContent = "Login failed: " + error.message;
-        } else {
-            showPopup(); 
+            if (error) {
+                throw error;
+            }
+
+            showPopup();
             console.log("User:", data.user);
-        }
+            sessionStorage.setItem("user", JSON.stringify(data.user));
+
+            setTimeout(() => {
+                window.location.href = "/dashboard.html"; // Change this to your actual dashboard page
+            }, 1500);
+
+        } catch (error) {
+            errorMessage.textContent = "Login failed: " + error.message;
+        } 
     });
 });
 
